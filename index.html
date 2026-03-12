@@ -4,19 +4,18 @@
 <title>Smart Campus</title>
 
 <style>
-
 body{
-font-family:Arial;
-background:#f4f6f9;
+font-family: Arial;
+background:#f0f2f5;
 text-align:center;
 }
 
-.container{
-width:350px;
-margin:auto;
+.box{
 background:white;
 padding:20px;
-margin-top:50px;
+width:350px;
+margin:auto;
+margin-top:60px;
 box-shadow:0px 0px 10px gray;
 }
 
@@ -27,7 +26,7 @@ margin:5px;
 }
 
 button{
-padding:10px 20px;
+padding:10px 15px;
 background:#007bff;
 color:white;
 border:none;
@@ -36,37 +35,32 @@ cursor:pointer;
 
 table{
 margin:auto;
-margin-top:20px;
+margin-top:15px;
 border-collapse:collapse;
 }
 
-td,th{
+th,td{
 border:1px solid gray;
 padding:8px;
 }
-
 </style>
 
 </head>
 
 <body>
 
-<!-- LOGIN PAGE -->
-
-<div class="container" id="loginPage">
+<div id="loginPage" class="box">
 
 <h2>Smart Campus Login</h2>
 
-<input id="username" placeholder="Username"><br>
-<input id="password" type="password" placeholder="Password"><br>
+<input type="text" id="username" placeholder="Username"><br>
+<input type="password" id="password" placeholder="Password"><br>
 
 <button type="button" onclick="login()">Login</button>
 
-<p id="msg"></p>
+<p id="loginMsg"></p>
 
 </div>
-
-<!-- DASHBOARD -->
 
 <div id="dashboard" style="display:none">
 
@@ -92,17 +86,15 @@ padding:8px;
 <th>Status</th>
 </tr>
 </thead>
-
 <tbody id="attendanceTable"></tbody>
-
 </table>
 
 <hr>
 
-<h3>Assignment</h3>
+<h3>Assignments</h3>
 
-<input id="assignmentTitle" placeholder="Assignment Title">
-<input id="assignmentDesc" placeholder="Description">
+<input id="assignTitle" placeholder="Assignment Title">
+<input id="assignDesc" placeholder="Description">
 
 <button onclick="addAssignment()">Add Assignment</button>
 
@@ -120,15 +112,12 @@ padding:8px;
 
 </div>
 
-<!-- FIREBASE -->
-
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
 
 const firebaseConfig = {
-
 apiKey: "YOUR_API_KEY",
 authDomain: "YOUR_PROJECT.firebaseapp.com",
 databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
@@ -136,19 +125,17 @@ projectId: "YOUR_PROJECT",
 storageBucket: "YOUR_PROJECT.appspot.com",
 messagingSenderId: "XXXX",
 appId: "XXXX"
-
 };
 
 firebase.initializeApp(firebaseConfig);
-
 var db = firebase.database();
 
 function login(){
 
-var user=document.getElementById("username").value;
-var pass=document.getElementById("password").value;
+var u=document.getElementById("username").value.trim();
+var p=document.getElementById("password").value.trim();
 
-if(user=="admin" && pass=="1234"){
+if(u==="admin" && p==="1234"){
 
 document.getElementById("loginPage").style.display="none";
 document.getElementById("dashboard").style.display="block";
@@ -159,7 +146,7 @@ loadNotices();
 
 }else{
 
-document.getElementById("msg").innerHTML="Invalid Login";
+document.getElementById("loginMsg").innerText="Wrong Username or Password";
 
 }
 
@@ -183,21 +170,17 @@ function loadAttendance(){
 
 db.ref("attendance").on("value",function(snapshot){
 
-var table="";
+var html="";
 
-snapshot.forEach(function(data){
+snapshot.forEach(function(child){
 
-var d=data.val();
+var d=child.val();
 
-table+="<tr>";
-table+="<td>"+d.name+"</td>";
-table+="<td>"+d.roll+"</td>";
-table+="<td>"+d.status+"</td>";
-table+="</tr>";
+html+="<tr><td>"+d.name+"</td><td>"+d.roll+"</td><td>"+d.status+"</td></tr>";
 
 });
 
-document.getElementById("attendanceTable").innerHTML=table;
+document.getElementById("attendanceTable").innerHTML=html;
 
 });
 
@@ -205,8 +188,8 @@ document.getElementById("attendanceTable").innerHTML=table;
 
 function addAssignment(){
 
-var title=document.getElementById("assignmentTitle").value;
-var desc=document.getElementById("assignmentDesc").value;
+var title=document.getElementById("assignTitle").value;
+var desc=document.getElementById("assignDesc").value;
 
 db.ref("assignments").push({
 title:title,
@@ -219,17 +202,17 @@ function loadAssignments(){
 
 db.ref("assignments").on("value",function(snapshot){
 
-var list="";
+var html="";
 
-snapshot.forEach(function(data){
+snapshot.forEach(function(child){
 
-var d=data.val();
+var d=child.val();
 
-list+="<li>"+d.title+" - "+d.desc+"</li>";
+html+="<li>"+d.title+" : "+d.desc+"</li>";
 
 });
 
-document.getElementById("assignmentList").innerHTML=list;
+document.getElementById("assignmentList").innerHTML=html;
 
 });
 
@@ -237,10 +220,10 @@ document.getElementById("assignmentList").innerHTML=list;
 
 function addNotice(){
 
-var notice=document.getElementById("noticeText").value;
+var text=document.getElementById("noticeText").value;
 
 db.ref("notices").push({
-text:notice
+text:text
 });
 
 }
@@ -249,17 +232,17 @@ function loadNotices(){
 
 db.ref("notices").on("value",function(snapshot){
 
-var list="";
+var html="";
 
-snapshot.forEach(function(data){
+snapshot.forEach(function(child){
 
-var d=data.val();
+var d=child.val();
 
-list+="<li>"+d.text+"</li>";
+html+="<li>"+d.text+"</li>";
 
 });
 
-document.getElementById("noticeList").innerHTML=list;
+document.getElementById("noticeList").innerHTML=html;
 
 });
 
