@@ -300,6 +300,23 @@ list.appendChild(li);
 document.getElementById("noticeText").value="";
 
 }
+  function login() {
+
+var username = document.getElementById("username").value;
+var password = document.getElementById("password").value;
+
+if(username === "admin" && password === "1234"){
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("dashboard").style.display="block";
+
+}else{
+
+alert("Invalid login");
+
+}
+
+}
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
   // TODO: Add SDKs for Firebase products that you want to use
