@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Smart Campus Management</title>
+<title>Smart Campus</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f4f4f4;
+background:#f4f6f9;
 text-align:center;
 }
 
 .container{
-width:90%;
+width:350px;
 margin:auto;
-}
-
-.box{
-width:320px;
-margin:120px auto;
-padding:20px;
 background:white;
-border-radius:10px;
-box-shadow:0 0 10px gray;
+padding:20px;
+margin-top:50px;
+box-shadow:0px 0px 10px gray;
 }
 
-input,select,textarea{
+input,select{
 width:90%;
 padding:10px;
 margin:5px;
@@ -33,31 +28,21 @@ margin:5px;
 
 button{
 padding:10px 20px;
-background:blue;
+background:#007bff;
 color:white;
 border:none;
 cursor:pointer;
-border-radius:5px;
-margin:5px;
-}
-
-.menu button{
-margin:10px;
 }
 
 table{
 margin:auto;
+margin-top:20px;
 border-collapse:collapse;
-background:white;
 }
 
-table,th,td{
-border:1px solid black;
+td,th{
+border:1px solid gray;
 padding:8px;
-}
-
-.page{
-display:none;
 }
 
 </style>
@@ -66,278 +51,219 @@ display:none;
 
 <body>
 
-<!-- LOGIN -->
+<!-- LOGIN PAGE -->
 
-<div id="loginPage" class="box">
+<div class="container" id="loginPage">
 
 <h2>Smart Campus Login</h2>
 
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
+<input id="username" placeholder="Username"><br>
+<input id="password" type="password" placeholder="Password"><br>
 
 <button type="button" onclick="login()">Login</button>
-<p id="message"></p>
+
+<p id="msg"></p>
 
 </div>
 
 <!-- DASHBOARD -->
 
-<div id="dashboard" class="page">
+<div id="dashboard" style="display:none">
 
-<h1>Smart Campus Dashboard</h1>
+<h2>Smart Campus Dashboard</h2>
 
-<div class="menu">
+<h3>Attendance</h3>
 
-<button onclick="showAttendance()">Attendance</button>
-<button onclick="showAssignment()">Assignments</button>
-<button onclick="showNotice()">Notice Board</button>
-<button onclick="logout()">Logout</button>
-
-</div>
-
-</div>
-
-<!-- ATTENDANCE -->
-
-<div id="attendancePage" class="page">
-
-<h2>Attendance Management</h2>
-
-<input type="text" id="student" placeholder="Student Name">
-<input type="text" id="subject" placeholder="Subject">
+<input id="name" placeholder="Student Name">
+<input id="roll" placeholder="Roll Number">
 
 <select id="status">
 <option>Present</option>
 <option>Absent</option>
 </select>
 
-<br>
-
 <button onclick="addAttendance()">Add Attendance</button>
 
-<br><br>
-
-<table id="attendanceTable">
-
+<table>
+<thead>
 <tr>
-<th>Student</th>
-<th>Subject</th>
+<th>Name</th>
+<th>Roll</th>
 <th>Status</th>
 </tr>
+</thead>
+
+<tbody id="attendanceTable"></tbody>
 
 </table>
 
-<br>
+<hr>
 
-<button onclick="back()">Back</button>
+<h3>Assignment</h3>
 
-</div>
-
-<!-- ASSIGNMENTS -->
-
-<div id="assignmentPage" class="page">
-
-<h2>Assignment Management</h2>
-
-<input type="text" id="assignmentTitle" placeholder="Assignment Title">
-
-<input type="date" id="dueDate">
-
-<br>
+<input id="assignmentTitle" placeholder="Assignment Title">
+<input id="assignmentDesc" placeholder="Description">
 
 <button onclick="addAssignment()">Add Assignment</button>
 
-<br><br>
+<ul id="assignmentList"></ul>
 
-<table id="assignmentTable">
+<hr>
 
-<tr>
-<th>Assignment</th>
-<th>Due Date</th>
-</tr>
+<h3>Notice Board</h3>
 
-</table>
+<input id="noticeText" placeholder="Enter Notice">
 
-<br>
-
-<button onclick="back()">Back</button>
-
-</div>
-
-<!-- NOTICE BOARD -->
-
-<div id="noticePage" class="page">
-
-<h2>Notice Board</h2>
-
-<textarea id="noticeText" placeholder="Enter Notice"></textarea>
-
-<br>
-
-<button onclick="addNotice()">Add Notice</button>
-
-<br><br>
+<button onclick="addNotice()">Post Notice</button>
 
 <ul id="noticeList"></ul>
 
-<br>
-
-<button onclick="back()">Back</button>
-
 </div>
+
+<!-- FIREBASE -->
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 
 <script>
 
+const firebaseConfig = {
+
+apiKey: "YOUR_API_KEY",
+authDomain: "YOUR_PROJECT.firebaseapp.com",
+databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+projectId: "YOUR_PROJECT",
+storageBucket: "YOUR_PROJECT.appspot.com",
+messagingSenderId: "XXXX",
+appId: "XXXX"
+
+};
+
+firebase.initializeApp(firebaseConfig);
+
+var db = firebase.database();
+
 function login(){
 
-var username = document.getElementById("username").value.trim();
-var password = document.getElementById("password").value.trim();
+var user=document.getElementById("username").value;
+var pass=document.getElementById("password").value;
 
-if(username === "admin" && password === "1234"){
+if(user=="admin" && pass=="1234"){
 
-document.getElementById("loginPage").style.display = "none";
-document.getElementById("dashboard").style.display = "block";
+document.getElementById("loginPage").style.display="none";
+document.getElementById("dashboard").style.display="block";
+
+loadAttendance();
+loadAssignments();
+loadNotices();
 
 }else{
 
-document.getElementById("message").innerHTML = "Invalid Login";
+document.getElementById("msg").innerHTML="Invalid Login";
 
 }
-
-}
-function logout(){
-
-document.getElementById("dashboard").style.display="none";
-document.getElementById("loginPage").style.display="block";
-
-}
-
-function showAttendance(){
-
-hideAll();
-document.getElementById("attendancePage").style.display="block";
-
-}
-
-function showAssignment(){
-
-hideAll();
-document.getElementById("assignmentPage").style.display="block";
-
-}
-
-function showNotice(){
-
-hideAll();
-document.getElementById("noticePage").style.display="block";
-
-}
-
-function back(){
-
-hideAll();
-document.getElementById("dashboard").style.display="block";
-
-}
-
-function hideAll(){
-
-document.getElementById("dashboard").style.display="none";
-document.getElementById("attendancePage").style.display="none";
-document.getElementById("assignmentPage").style.display="none";
-document.getElementById("noticePage").style.display="none";
 
 }
 
 function addAttendance(){
 
-var student=document.getElementById("student").value;
-var subject=document.getElementById("subject").value;
+var name=document.getElementById("name").value;
+var roll=document.getElementById("roll").value;
 var status=document.getElementById("status").value;
 
-var table=document.getElementById("attendanceTable");
+db.ref("attendance").push({
+name:name,
+roll:roll,
+status:status
+});
 
-var row=table.insertRow();
+}
 
-row.insertCell(0).innerHTML=student;
-row.insertCell(1).innerHTML=subject;
-row.insertCell(2).innerHTML=status;
+function loadAttendance(){
 
-document.getElementById("student").value="";
-document.getElementById("subject").value="";
+db.ref("attendance").on("value",function(snapshot){
+
+var table="";
+
+snapshot.forEach(function(data){
+
+var d=data.val();
+
+table+="<tr>";
+table+="<td>"+d.name+"</td>";
+table+="<td>"+d.roll+"</td>";
+table+="<td>"+d.status+"</td>";
+table+="</tr>";
+
+});
+
+document.getElementById("attendanceTable").innerHTML=table;
+
+});
 
 }
 
 function addAssignment(){
 
 var title=document.getElementById("assignmentTitle").value;
-var date=document.getElementById("dueDate").value;
+var desc=document.getElementById("assignmentDesc").value;
 
-var table=document.getElementById("assignmentTable");
+db.ref("assignments").push({
+title:title,
+desc:desc
+});
 
-var row=table.insertRow();
+}
 
-row.insertCell(0).innerHTML=title;
-row.insertCell(1).innerHTML=date;
+function loadAssignments(){
 
-document.getElementById("assignmentTitle").value="";
-document.getElementById("dueDate").value="";
+db.ref("assignments").on("value",function(snapshot){
+
+var list="";
+
+snapshot.forEach(function(data){
+
+var d=data.val();
+
+list+="<li>"+d.title+" - "+d.desc+"</li>";
+
+});
+
+document.getElementById("assignmentList").innerHTML=list;
+
+});
 
 }
 
 function addNotice(){
 
-var text=document.getElementById("noticeText").value;
+var notice=document.getElementById("noticeText").value;
 
-var list=document.getElementById("noticeList");
-
-var li=document.createElement("li");
-
-li.innerText=text;
-
-list.appendChild(li);
-
-document.getElementById("noticeText").value="";
-
-}
-  function login() {
-
-var username = document.getElementById("username").value;
-var password = document.getElementById("password").value;
-
-if(username === "admin" && password === "1234"){
-
-document.getElementById("loginPage").style.display="none";
-document.getElementById("dashboard").style.display="block";
-
-}else{
-
-alert("Invalid login");
+db.ref("notices").push({
+text:notice
+});
 
 }
 
+function loadNotices(){
+
+db.ref("notices").on("value",function(snapshot){
+
+var list="";
+
+snapshot.forEach(function(data){
+
+var d=data.val();
+
+list+="<li>"+d.text+"</li>";
+
+});
+
+document.getElementById("noticeList").innerHTML=list;
+
+});
+
 }
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
-
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyAVrWGjj0FO_-iVSy3-uXzYUG0ofbUHchk",
-    authDomain: "smart-campus-d9f24.firebaseapp.com",
-    databaseURL: "https://smart-campus-d9f24-default-rtdb.firebaseio.com",
-    projectId: "smart-campus-d9f24",
-    storageBucket: "smart-campus-d9f24.firebasestorage.app",
-    messagingSenderId: "929042242543",
-    appId: "1:929042242543:web:cee1f967fa56c27a89b41a",
-    measurementId: "G-KEJY1X46XX"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
 
 </script>
 
