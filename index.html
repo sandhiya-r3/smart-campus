@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Smart Campus Management</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+text-align:center;
+}
+
+.container{
+width:90%;
+margin:auto;
+}
+
+.box{
+width:320px;
+margin:120px auto;
+padding:20px;
+background:white;
+border-radius:10px;
+box-shadow:0 0 10px gray;
+}
+
+input,select,textarea{
+width:90%;
+padding:10px;
+margin:5px;
+}
+
+button{
+padding:10px 20px;
+background:blue;
+color:white;
+border:none;
+cursor:pointer;
+border-radius:5px;
+margin:5px;
+}
+
+.menu button{
+margin:10px;
+}
+
+table{
+margin:auto;
+border-collapse:collapse;
+background:white;
+}
+
+table,th,td{
+border:1px solid black;
+padding:8px;
+}
+
+.page{
+display:none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOGIN -->
+
+<div id="loginPage" class="box">
+
+<h2>Smart Campus Login</h2>
+
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="message"></p>
+
+</div>
+
+<!-- DASHBOARD -->
+
+<div id="dashboard" class="page">
+
+<h1>Smart Campus Dashboard</h1>
+
+<div class="menu">
+
+<button onclick="showAttendance()">Attendance</button>
+<button onclick="showAssignment()">Assignments</button>
+<button onclick="showNotice()">Notice Board</button>
+<button onclick="logout()">Logout</button>
+
+</div>
+
+</div>
+
+<!-- ATTENDANCE -->
+
+<div id="attendancePage" class="page">
+
+<h2>Attendance Management</h2>
+
+<input type="text" id="student" placeholder="Student Name">
+<input type="text" id="subject" placeholder="Subject">
+
+<select id="status">
+<option>Present</option>
+<option>Absent</option>
+</select>
+
+<br>
+
+<button onclick="addAttendance()">Add Attendance</button>
+
+<br><br>
+
+<table id="attendanceTable">
+
+<tr>
+<th>Student</th>
+<th>Subject</th>
+<th>Status</th>
+</tr>
+
+</table>
+
+<br>
+
+<button onclick="back()">Back</button>
+
+</div>
+
+<!-- ASSIGNMENTS -->
+
+<div id="assignmentPage" class="page">
+
+<h2>Assignment Management</h2>
+
+<input type="text" id="assignmentTitle" placeholder="Assignment Title">
+
+<input type="date" id="dueDate">
+
+<br>
+
+<button onclick="addAssignment()">Add Assignment</button>
+
+<br><br>
+
+<table id="assignmentTable">
+
+<tr>
+<th>Assignment</th>
+<th>Due Date</th>
+</tr>
+
+</table>
+
+<br>
+
+<button onclick="back()">Back</button>
+
+</div>
+
+<!-- NOTICE BOARD -->
+
+<div id="noticePage" class="page">
+
+<h2>Notice Board</h2>
+
+<textarea id="noticeText" placeholder="Enter Notice"></textarea>
+
+<br>
+
+<button onclick="addNotice()">Add Notice</button>
+
+<br><br>
+
+<ul id="noticeList"></ul>
+
+<br>
+
+<button onclick="back()">Back</button>
+
+</div>
+
+<script>
+
+function login(){
+
+var username=document.getElementById("username").value;
+var password=document.getElementById("password").value;
+
+if(username=="admin" && password=="1234"){
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("dashboard").style.display="block";
+
+}else{
+
+document.getElementById("message").innerHTML="Invalid Login";
+
+}
+
+}
+
+function logout(){
+
+document.getElementById("dashboard").style.display="none";
+document.getElementById("loginPage").style.display="block";
+
+}
+
+function showAttendance(){
+
+hideAll();
+document.getElementById("attendancePage").style.display="block";
+
+}
+
+function showAssignment(){
+
+hideAll();
+document.getElementById("assignmentPage").style.display="block";
+
+}
+
+function showNotice(){
+
+hideAll();
+document.getElementById("noticePage").style.display="block";
+
+}
+
+function back(){
+
+hideAll();
+document.getElementById("dashboard").style.display="block";
+
+}
+
+function hideAll(){
+
+document.getElementById("dashboard").style.display="none";
+document.getElementById("attendancePage").style.display="none";
+document.getElementById("assignmentPage").style.display="none";
+document.getElementById("noticePage").style.display="none";
+
+}
+
+function addAttendance(){
+
+var student=document.getElementById("student").value;
+var subject=document.getElementById("subject").value;
+var status=document.getElementById("status").value;
+
+var table=document.getElementById("attendanceTable");
+
+var row=table.insertRow();
+
+row.insertCell(0).innerHTML=student;
+row.insertCell(1).innerHTML=subject;
+row.insertCell(2).innerHTML=status;
+
+document.getElementById("student").value="";
+document.getElementById("subject").value="";
+
+}
+
+function addAssignment(){
+
+var title=document.getElementById("assignmentTitle").value;
+var date=document.getElementById("dueDate").value;
+
+var table=document.getElementById("assignmentTable");
+
+var row=table.insertRow();
+
+row.insertCell(0).innerHTML=title;
+row.insertCell(1).innerHTML=date;
+
+document.getElementById("assignmentTitle").value="";
+document.getElementById("dueDate").value="";
+
+}
+
+function addNotice(){
+
+var text=document.getElementById("noticeText").value;
+
+var list=document.getElementById("noticeList");
+
+var li=document.createElement("li");
+
+li.innerText=text;
+
+list.appendChild(li);
+
+document.getElementById("noticeText").value="";
+
+}
+
+</script>
+
+</body>
+</html>
